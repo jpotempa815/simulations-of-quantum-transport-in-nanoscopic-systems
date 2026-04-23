@@ -1,0 +1,149 @@
+Calculating single-electron states in quantum dots
+A. Mreńca-Kolasińska
+April 2, 2021; last update April 2, 2025
+1 Introduction
+The topic of this project is the calculation of electron states conﬁned in quantum dots. We consider two-
+dimensional (2D) quantum dot with harmonic oscillator potential proﬁle, which works well for the description
+of semiconductor quantum dots (due to the high excitation energy in thez direction, eﬀectively electrons are
+in the ground state inz, so we need to consider only thex and y dimensions).
+The problem comes down to solving the Schrödinger equation
+ˆHΨ(⃗ r) =EΨ(⃗ r) (1)
+and ﬁnding the eigenenergiesE and eigenfunctions Ψ.
+1.1 The Galerkin method
+In the Galerkin method the wave function is expanded in a basis
+Ψ(⃗ r) =
+N∑
+i=1
+ciϕi(⃗ r), (2)
+where ϕi(⃗ r) are the basis functions, andci the linear expansion coeﬃcients. We require that the residual,
+evaluated as
+ε = ˆHΨ(⃗ r)−EΨ(⃗ r), (3)
+is minimized. We convert the equation to the weak form by calculating the scalar products with the basis
+functions; the residual is orthogonal to each of the basis functions. We obtain the equation
+N∑
+i=1
+⟨ϕj| ˆH|ϕi⟩ci =E
+N∑
+i=1
+⟨ϕj|ϕi⟩ci, (4)
+that in the matrix form reads
+Hc =ESc, (5)
+which is a generalized eigenproblem.
+1.2 Calculations for two-dimensional harmonic oscillator
+The 2D Hamiltonian in atomic units has the form
+ˆH =− 1
+2m∗
+( ∂2
+∂x2 + ∂2
+∂y 2
+)
++V (x,y ), (6)
+where for 2D harmonic oscilator V (x,y ) = 1
+2m∗(ω2
+xx2 +ω2
+yy2), and m∗ is the electron eﬀective mass in a
+semiconductor.
+We will use the Gaussian basis
+ϕk(x,y ) = 1
+(αxπ)1/4 exp
+(
+−(x−xk)2
+2αx
+) 1
+(αyπ)1/4 exp
+(
+−(y−yk)2
+2αy
+)
+, (7)
+where rk = (xk,yk) is the position of the center of the Gaussian function, andαx, αy describe its width.
+1
+
+For the calculation of bound states we need to calculate the elements of matricesH and S. For the Gaussian
+basis, it is convenient to calculate them analytically. In 2D they are given by
+Skl =
+∞∫
+−∞
+ϕk(x,y )ϕl(x,y )dxdy = exp(− (xk−xl)2
+4αx
+− (yk−yl)2
+4αy
+), (8)
+Hkl = Kkl +Vkl, (9)
+Kkl = − 1
+2m
+∞∫
+−∞
+ϕk(x,y )
+(
+∂2
+∂x2 + ∂2
+∂y 2
+)
+ϕl(x,y )dxdy =− 1
+2m
+[
+(xk−xl)2−2αx
+4α2x
++ (yk−yl)2−2αy
+4α2y
+]
+Skl, (10)
+Vkl = 1
+2m
+∞∫
+−∞
+ϕk(x,y )
+(
+ω2
+xx2 +ω2
+yy2)
+ϕl(x,y )dxdy = 1
+2m
+[
+ω2
+x
+(xk+xl)2+2αx
+4 +ω2
+y
+(yk+yl)2+2αy
+4
+]
+Skl. (11)
+1.3 Tasks
+We will create a grid ofn×n equally spaced nodes with positions in the intervalx∈ [−a,a ], y∈ [−a,a ]. The
+node spacing is∆x. Each node is a center of one Gaussian function (7); there areN =n2 nodes in total. Let
+us assumen = 9 and ℏωx = 80 meV, ℏωy = 200 meV (in atomic units the energy is expressed inEh = 27211
+meV andℏ = 1, so in our programωx = 80/Eh etc., and the position unit is Bohr radiusa0 = 0.0529 nm). We
+will assumeαx(y) = ℏ
+m∗ωx(y)
+and eﬀective massm∗ = 0.241.
+1. Create arrays of the node positionsxk,yk,k = 0,...,N − 1. The grid is two dimensional with indices
+(i,j ), so we map the two indices to a single index(i,j )→ k, e.g. by k = i·n +j, i,j = 0,...,n − 1.
+Conversion ofk to i,j : i =k/n (integer number division – in Pythonk // n ), j =k%n.
+xk =xi(k) =−a + ∆x·i, i = 0,...,n − 1,
+yk =yj(k) =−a + ∆x·j, j = 0,...,n − 1.
+Implement the functions (7) returning thekth Gaussian, centered atxk,yk, as a function of(x,y ). For a
+test, we will plot maps of a few basis functions with∆x = 1 nm in = 9, anda = ∆x· (n− 1)/2. (Note
+that the (x,y ) points should be on a denser grid, e.g. with the spacing 0.1 nm). Plot three of the basis
+functions, e.g.k = 0, 8, 9.
+2. Implement the calculation of arrays of matrix elements of the overlap integral matrixS and the Hamil-
+tonian H using (8-11), for generalωx, ωy, etc., passed as function parameters. Solve the generalized
+eigenproblem numerically using a library of your choice (in Python you can usescipy.linalg.eigh, in C
+e.g. z gsl_eigen_gensymmv of the GSL library, in C++ also e.g.GeneralizedSelfAdjointEigenSolver
+from the Eigen library).
+3. For ∆x = 1 nm calculate the squared modulus of the wave functions of 6 lowest states and plot their maps
+(use the functions (7) you implemented and the expansion coeﬃcientsci obtained as the eigenvectors from
+the generalized eigenvalue problem).
+4. Calculate energies of 10 lowest states as a function ofℏωx∈ [0, 500] meV andωy = 200 meV, and plot
+them. With dashed lines plot analytical energies for a few lowest states.
+5. Compare the results with the experimental work2; the STM measurement results for the states conﬁned
+in a quantum dot are shown in Fig. 1. Try to choose a value ofωy such that the lowest 5 states are only
+excited in thex direction and calculate the wave functions again (task 3).
+1This is the eﬀective mass measured in the publication Nano Letters for InAs quantum dots embedded in AlAs.
+2K. Teichmannet al, Harmonic oscillator wave functions of a self-assembled InAs quantum dot measured by scanning tunneling
+microscopy,Nano Lett. 13, 8 (2013).
+2
+
+Figure 1: STM maps for various gate voltages measured in the work in Nano Letters.
+3
