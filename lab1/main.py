@@ -163,7 +163,7 @@ plt.savefig("taskfour.png", dpi=300)
 plt.show()
 
 #task five
-set_omegas(80, 400) # Increase wy to 400 meV so the lowest 5 states are excited only in x
+set_omegas(80, 400)
 figure3, axes3 = plt.subplots(2, 3, figsize=(12, 12))
 axes3 = axes3.flatten()
 for i in range(6):
